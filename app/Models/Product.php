@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Http\Controllers\Seller\SellerController;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -25,4 +26,17 @@ class Product extends Model
     public function productUnavailable(){
         return $this->status = self::PRODUCT_UNAVAILABLE;
     }
+
+    public function transaccions(){
+        return $this->hasMany(Transaction::class);
+    }
+
+    public function seller(){
+        return $this->belongsTo(Seller::class);
+    }
+
+    public function categories(){
+        return  $this->belongsToMany(Category::class);
+    }
+
 }
