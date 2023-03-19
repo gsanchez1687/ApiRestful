@@ -3,6 +3,7 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -38,6 +39,22 @@ class User extends Authenticatable
         'remember_token',
         'verification_token',
     ];
+
+    protected function name(): Attribute
+    {
+        return Attribute::make(
+            get: fn (string $value) => ucfirst($value),
+            set: fn (string $value) => strtolower($value),
+        );
+    }
+
+    protected function email(): Attribute
+    {
+        return Attribute::make(
+            get: fn (string $value) => strtolower($value),
+            set: fn (string $value) => strtolower($value),
+        );
+    }
 
     protected $casts = [
         'email_verified_at' => 'datetime',

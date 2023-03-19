@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 class Product extends Model
 {
     use HasFactory;
+    protected $table = 'products';
     const PRODUCT_AVAILABLE = 'available';
     const PRODUCT_UNAVAILABLE = 'unavailable';
     protected $filllable = [

@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 //Buyeres
-Route::resource('buyers','Buyer\BuyerController')->only(['index','show']);
+Route::resource('buyers','Buyer\BuyerController')->except(['create','edit']);
 
 //Categories
 Route::resource('categories','Category\CategoryController')->except(['create','edit']);
@@ -29,4 +29,4 @@ Route::resource('transactions','Transaction\TransactionController')->only(['inde
 Route::resource('sellers','Seller\SellerController')->only(['index','show']);
 
 //User
-Route::resource('users','User\UserController')->only(['create','edit']);
+Route::resource('user','User\UserController')->except(['create','edit']);
