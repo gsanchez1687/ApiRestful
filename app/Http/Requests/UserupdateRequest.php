@@ -23,6 +23,7 @@ class UserupdateRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'name'=>'required',
             'email' => 'email|unique:users,email,',
             'password'=>'min:6|confirmed',
             'admin' => 'in:' . User::USUARIO_ADMINISTRADOR . ',' . User::USUARIO_REGULAR,
