@@ -17,24 +17,14 @@ class UserController extends ApiController
     public function index()
     {
         $users = User::all();
-        if( !empty($users) && isset($users) )
-            return  response()->json(['data'=>$users],200);
-        else
-            abort(500);
+        return $this->showAll($users,200);
     }
 
-
-
-    /**
-     * Display the specified resource.
-     */
     public function show(string $id)
     {
-        $users = User::findOrFail($id);
-        if( !empty($users) && isset($users) )
-            return response()->json(['data'=>$users],200);
-        else
-            abort(500);    
+        $user = User::findOrFail($id);
+        return $this->showOne($user,200);
+        
     }
 
     public function store(UserRequest $request){
@@ -48,37 +38,37 @@ class UserController extends ApiController
 
         $user = User::create($requests);
         if( !empty($user) && isset($user) )
-            return response()->json(['data'=>$user],201);
+            return $this->showOne($user,201);
         else
             abort(500);    
     }
 
     public function update(UserupdateRequest $request, $id){
 
-        $users = User::findOrFail($id);
+        $user = User::findOrFail($id);
         if($request->has('name'))
-            $users->name = $request->name;
+            $user->name = $request->name;
 
-        if( $request->has('email') && $users->email != $request->email ){
-            $users->verifed  = User::USUARIO_NO_VERIFICADO;
-            $users->verification_token = User::generarverificacionToken();
-            $users->email = $request->email;
+        if( $request->has('email') && $user->email != $request->email ){
+            $user->verifed  = User::USUARIO_NO_VERIFICADO;
+            $user->verification_token = User::generarverificacionToken();
+            $user->email = $request->email;
         }
         if( $request->has('password') )
-            $users->password = bcrypt($request->password);
+            $user->password = bcrypt($request->password);
 
         if( $request->has('admin') ){
-            if( !$users->UsuarioVerificado() ){
+            if( !$user->UsuarioVerificado() ){
                 return response()->json([
                     'error' => 'Solo los usuario verificados pueden cambiar el valor de administrador',
                     'code' =>409,
                 ],409);
             }
-            $users->admin = $request->admin;
+            $user->admin = $request->admin;
                 
         }
-        $users->save();
-        return response()->json(['data'=>$users],200);
+        $user->save();
+        return $this->showOne($user,200);
                 
     }
 
@@ -87,8 +77,8 @@ class UserController extends ApiController
      */
     public function destroy(string $id)
     {
-        $users = User::findOrFail($id);
-        $users->delete();
-        return response()->json(['data'=>$users],200);
+        $user = User::findOrFail($id);
+        $user->delete();
+        return $this->showOne($user,200);
     }
 }
