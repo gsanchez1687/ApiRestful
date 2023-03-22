@@ -3,9 +3,12 @@
 namespace App\Exceptions;
 use Exception;
 use App\Traits\ApiResponser;
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Throwable;
 
 class Handler extends ExceptionHandler
@@ -17,12 +20,7 @@ class Handler extends ExceptionHandler
     ];
 
     protected $dontReport = [
-        \Illuminate\Auth\AuthenticationException::class,
-        \Illuminate\Auth\Access\AuthorizationException::class,
-        \Symfony\Component\HttpKernel\Exception\HttpException::class,
-        \Illuminate\Database\Eloquent\ModelNotFoundException::class,
-        \Illuminate\Session\TokenMismatchException::class,
-        \Illuminate\Validation\ValidationException::class,
+    
     ];
 
     protected $dontFlash = [
@@ -31,10 +29,16 @@ class Handler extends ExceptionHandler
         'password_confirmation',
     ];
 
-    public function report(Exception $exception)
-    {
-        parent::report($exception);
+    protected function unauthenticated($request, AuthenticationException $exception){
+        return $this->errorResponse('No autenticado.', 401);
     }
+
+    protected function convertValidationExceptionToResponse(ValidationException $e, $request){
+        $errors = $e->validator->errors()->getMessages();
+        return $this->errorResponse($errors, 422);
+    }
+
+  
 
   
     public function register(): void
@@ -56,17 +60,20 @@ class Handler extends ExceptionHandler
             return $this->errorResponse("No existe Ninguna Instancia del modelo {$modelo} con el id espeficico", 404);
         }
 
+        if ($exception instanceof AuthenticationException) {
+            return $this->unauthenticated($request, $exception);
+        }
+
+        if($exception instanceof AuthorizationException ){
+            return $this->errorResponse('No tienes permisos para ejecutar esta accion',403);
+        }
+
+        //Capturando cuando introducen una url equivocada
+        if($exception instanceof NotFoundHttpException ){
+            return $this->errorResponse('No se encontro la ruta',404);
+        }
+
+
         return parent::render($request, $exception);//hacemos uso del render del framework
-    }
-
-    protected function unauthenticated($request, AuthenticationException $exception)
-    {
-        return $this->errorResponse('No autenticado.', 401);        
-    }
-
-    protected function convertValidationExceptionToResponse(ValidationException $e, $request)
-    {
-        $errors = $e->validator->errors()->getMessages();
-        return $this->errorResponse($errors, 422);
     }
 }
