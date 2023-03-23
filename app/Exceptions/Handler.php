@@ -82,16 +82,20 @@ class Handler extends ExceptionHandler
             return $this->errorResponse($exception->getMessage(),$exception->getStatusCode());
         }
 
-        //Controlando los Query
+        //Controlando los Query.
         if($exception instanceof QueryException ){
             $code = $exception->errorInfo[1];
             if($code == 1451)
                 return $this->errorResponse("No se puede eliminar porque el ID tiene relaciones con otras tablas",409);
         }
 
+        if( config('app.debug') ){
+            //hacemos uso del render del framework
+            return parent::render($request, $exception);
+        }
 
-
-
-        return parent::render($request, $exception);//hacemos uso del render del framework
+        //Si por alguna razon hay problemas con el servidor, base de datos o algo externo.
+        return $this->errorResponse("Falla Inesperada. Intente luego",500);
+        
     }
 }
