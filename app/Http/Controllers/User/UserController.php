@@ -20,9 +20,10 @@ class UserController extends ApiController
         return $this->showAll($users,200);
     }
 
-    public function show(string $id)
+    //Uso de inyeccion de dependencias
+    // User $user
+    public function show(User $user)
     {
-        $user = User::findOrFail($id);
         return $this->showOne($user,200);
         
     }
