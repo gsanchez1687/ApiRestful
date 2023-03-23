@@ -14,9 +14,9 @@ class BuyerController extends ApiController
         return $this->showAll($buyers,200);
     }
 
-    public function show($id)
+    //Uso de inyeccion de dependencias implicita del modelo
+    public function show(Buyer $buyer)
     {
-        $buyer = Buyer::has('transactions')->findOrFail($id);
         return $this->showOne($buyer,200);
     }
 }
